@@ -1,11 +1,7 @@
-<script setup lang="js">
-
-</script>
+<script setup lang="js"></script>
 
 <template>
-<p>This is the home Page</p>
+  <p>This is the home Page</p>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

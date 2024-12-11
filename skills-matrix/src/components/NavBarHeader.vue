@@ -1,20 +1,14 @@
-<script setup lang="js">
-
-</script>
+<script setup lang="js"></script>
 
 <template>
-<div>
+  <div>
     <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <a href="#">Skills</a>
-        <a href="#">Admin</a>
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/login">Login</RouterLink>
+      <a href="#">Skills</a>
+      <a href="#">Admin</a>
     </nav>
-</div>
-
+  </div>
 </template>
 
-
-<style lang="css" scoped>
-
-
-</style>
+<style lang="css" scoped></style>

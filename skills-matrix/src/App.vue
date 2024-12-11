@@ -1,11 +1,14 @@
 <script setup>
 import SkillTable from "./components/SkillTable.vue";
+import NavBarHeader from "./components/NavBarHeader.vue";
 
 </script>
 
 <template>
-  <h1>Welcome to your new project!!</h1>
+  <NavBarHeader />
+ 
   <SkillTable />
+  
 
 </template>
 

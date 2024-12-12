@@ -4,7 +4,7 @@ import NavBarHeader from './components/NavBarHeader.vue'
 
 <template>
   <NavBarHeader />
- <RouterView />
+  <RouterView />
 </template>
 
 <style></style>

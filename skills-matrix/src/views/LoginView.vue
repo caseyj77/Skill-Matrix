@@ -1,5 +1,5 @@
 <script setup lang="js">
-import { RouterLink } from 'vue-router';
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
@@ -9,16 +9,29 @@ import { RouterLink } from 'vue-router';
         <h2>Login</h2>
 
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required placeholder="Enter your username">
+        <input
+          type="text"
+          id="username"
+          name="username"
+          required
+          placeholder="Enter your username"
+        />
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required placeholder="Enter your password">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          placeholder="Enter your password"
+        />
 
         <button type="submit">Login</button>
 
         <!-- Line of text for account creation -->
-        <p class="create-account-text"><br>
-          Don't have an account? <RouterLink to="/create-account">Create one here</RouterLink>.
+        <p class="create-account-text">
+          <br />
+          Don't have an account? Create one <RouterLink to="/create-account">here</RouterLink>.
         </p>
       </form>
     </div>
@@ -26,18 +39,16 @@ import { RouterLink } from 'vue-router';
 </template>
 
 <style scoped>
-
 /* Basic reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
-  
 }
 
 body {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 /* Styling the form sections container */
@@ -129,7 +140,5 @@ body {
 /* Invalid input styling */
 .user-form input:invalid {
   border-color: #e74c3c; /* Red border for invalid inputs */
-
 }
-
 </style>

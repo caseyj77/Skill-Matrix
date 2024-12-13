@@ -1,83 +1,61 @@
-<script setup lang="js">
+
+<script setup>
+/* eslint-disable no-unused-vars */
+import { supabase } from '@/lib/supabaseClient';
 import { ref } from 'vue';
 
-// create Reactive Variables to hold information entered
-const username = ref('');
 const email = ref('');
 const password = ref('');
-const confirmPassword = ref('');
 const errors = ref({});
+const successMessage = ref('');
 
-const validateForm = () => {
-  errors.value = {};
+const handleSignUp = async () => {
+  errors.value = {}; // Reset errors
 
-  if (!username.value.trim()) errors.value.username = 'Username is required';
-  if (!email.value.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) errors.value.email = 'Invalid email address';
+  if (!email.value.trim()) errors.value.email = 'Email is required';
+  if (!password.value.trim()) errors.value.password = 'Password is required';
   if (password.value.length < 6) errors.value.password = 'Password must be at least 6 characters';
-  if (password.value !== confirmPassword.value) errors.value.confirmPassword = 'Passwords do not match';
 
-  return Object.keys(errors.value).length === 0;
-};
+  if (Object.keys(errors.value).length > 0) return;
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-  if (validateForm()) {
-    alert('Form submitted successfully!');
-    // Perform form submission logic here
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+    });
+
+    if (error) {
+      errors.value.general = error.message;
+    } else {
+      successMessage.value = 'Account created successfully! Please check your email for confirmation.';
+    }
+  } catch (err) {
+    errors.value.general = 'An unexpected error occurred.';
   }
 };
-
 </script>
 
+
+
+
+
 <template>
-    <main class="content">
-      <section class="form-section-container">
-        <div class="form-section">
-          <form class="user-form" @submit="handleSubmit">
-            <h2>Create Account</h2>
-    
-            <label for="username">Username:</label>
-            <input
-              type="text"
-              id="username"
-              v-model="username"
-              required
-            />
-            <p v-if="errors.username" class="error-message">{{ errors.username }}</p>
-    
-            <label for="email">Email:</label>
-            <input
-              type="email"
-              id="email"
-              v-model="email"
-              required
-            />
-            <p v-if="errors.email" class="error-message">{{ errors.email }}</p>
-    
-            <label for="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              v-model="password"
-              required
-            />
-            <p v-if="errors.password" class="error-message">{{ errors.password }}</p>
-    
-            <label for="confirm-password">Confirm Password:</label>
-            <input
-              type="password"
-              id="confirm-password"
-              v-model="confirmPassword"
-              required
-            />
-            <p v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</p>
-    
-            <button type="submit">Sign Up</button>
-          </form>
-        </div>
-      </section>
-    </main>
-    </template>
+
+  <form @submit.prevent="handleSignUp">
+    <label for="email">Email:</label>
+    <input v-model="email" type="email" id="email" required />
+    <p v-if="errors.email">{{ errors.email }}</p>
+
+    <label for="password">Password:</label>
+    <input v-model="password" type="password" id="password" required />
+    <p v-if="errors.password">{{ errors.password }}</p>
+
+    <button type="submit">Sign Up</button>
+    <p v-if="errors.general" class="error-message">{{ errors.general }}</p>
+    <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+  </form>
+</template>
+
     
 
 <style lang="css" scoped>

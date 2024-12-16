@@ -1,24 +1,58 @@
 <script setup lang="js">
-import { RouterLink } from 'vue-router'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { supabase } from '@/lib/supabaseClient'
+
+const router = useRouter()
+
+// Reactive variables for login inputs
+const username = ref('')
+const password = ref('')
+
+// Error message state
+const errorMessage = ref('')
+
+// Login function
+const login = async () => {
+  errorMessage.value = ''
+
+  try {
+    // Supabase sign-in
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username.value, // Assuming username is an email
+      password: password.value,
+    })
+
+    if (error) throw error
+
+    // Redirect to home page on success
+    router.push('/')
+  } catch (error) {
+    errorMessage.value = error.message || 'Login failed. Please try again.'
+  }
+}
 </script>
+
 
 <template>
   <section class="form-section-container">
     <div class="form-section">
-      <form class="user-form" action="#" method="POST">
+      <form class="user-form" @submit.prevent="login">
         <h2>Login</h2>
 
-        <label for="username">Username:</label>
+        <label for="username">Email:</label>
         <input
+          v-model="username"
           type="text"
           id="username"
           name="username"
           required
-          placeholder="Enter your username"
+          placeholder="Enter your email"
         />
 
         <label for="password">Password:</label>
         <input
+          v-model="password"
           type="password"
           id="password"
           name="password"
@@ -27,8 +61,8 @@ import { RouterLink } from 'vue-router'
         />
 
         <button type="submit">Login</button>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
-        <!-- Line of text for account creation -->
         <p class="create-account-text">
           <br />
           Don't have an account? Create one <RouterLink to="/create-account">here</RouterLink>.
@@ -37,6 +71,7 @@ import { RouterLink } from 'vue-router'
     </div>
   </section>
 </template>
+
 
 <style scoped>
 /* Basic reset */

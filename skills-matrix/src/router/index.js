@@ -1,6 +1,7 @@
 import CreateAccountForm from '@/components/CreateAccountForm.vue'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
+import AccountProfileForm from '@/components/AccountProfileForm.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/create-account',
       name: 'createAccount',
       component: CreateAccountForm,
+    },
+    {
+      path: '/user-profile',
+      name: 'userProfile',
+      component: AccountProfileForm,
     },
   ],
 })

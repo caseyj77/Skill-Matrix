@@ -1,46 +1,41 @@
-
 <script setup>
 /* eslint-disable no-unused-vars */
-import { supabase } from '@/lib/supabaseClient';
-import { ref } from 'vue';
+import { supabase } from '@/lib/supabaseClient'
+import { ref } from 'vue'
 
-const email = ref('');
-const password = ref('');
-const errors = ref({});
-const successMessage = ref('');
+const email = ref('')
+const password = ref('')
+const errors = ref({})
+const successMessage = ref('')
 
 const handleSignUp = async () => {
-  errors.value = {}; // Reset errors
+  errors.value = {} // Reset errors
 
-  if (!email.value.trim()) errors.value.email = 'Email is required';
-  if (!password.value.trim()) errors.value.password = 'Password is required';
-  if (password.value.length < 6) errors.value.password = 'Password must be at least 6 characters';
+  if (!email.value.trim()) errors.value.email = 'Email is required'
+  if (!password.value.trim()) errors.value.password = 'Password is required'
+  if (password.value.length < 6) errors.value.password = 'Password must be at least 6 characters'
 
-  if (Object.keys(errors.value).length > 0) return;
+  if (Object.keys(errors.value).length > 0) return
 
   try {
     const { data, error } = await supabase.auth.signUp({
       email: email.value,
       password: password.value,
-    });
+    })
 
     if (error) {
-      errors.value.general = error.message;
+      errors.value.general = error.message
     } else {
-      successMessage.value = 'Account created successfully! Please check your email for confirmation.';
+      successMessage.value =
+        'Account created successfully! Please check your email for confirmation.'
     }
   } catch (err) {
-    errors.value.general = 'An unexpected error occurred.';
+    errors.value.general = 'An unexpected error occurred.'
   }
-};
+}
 </script>
 
-
-
-
-
 <template>
-
   <form @submit.prevent="handleSignUp">
     <label for="email">Email:</label>
     <input v-model="email" type="email" id="email" required />
@@ -56,10 +51,7 @@ const handleSignUp = async () => {
   </form>
 </template>
 
-    
-
 <style lang="css" scoped>
-
 * {
   margin: 0;
   padding: 0;
@@ -136,6 +128,4 @@ const handleSignUp = async () => {
 .user-form button:hover {
   background-color: #42b883;
 }
-
-
 </style>

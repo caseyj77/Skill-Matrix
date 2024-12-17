@@ -1,12 +1,18 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+// src/main.js
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import App from './App.vue';
+import router from './router';
+import { useUserStore } from '@/stores/userStore';
 
-import App from './App.vue'
-import router from './router'
+const app = createApp(App);
+const pinia = createPinia();
+app.use(pinia);
+app.use(router);
 
-const app = createApp(App)
+// Fetch user session when the app initializes
+const userStore = useUserStore();
+userStore.fetchUser();
 
-app.use(createPinia())
-app.use(router)
+app.mount('#app');
 
-app.mount('#app')

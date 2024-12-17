@@ -1,75 +1,44 @@
-<script setup lang="js">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { supabase } from '@/lib/supabaseClient'
+<script>
+import { supabase } from '@/lib/supabaseClient';
+import { useUserStore } from '@/stores/userStore';
 
-const router = useRouter()
+export default {
+  data() {
+    return {
+      email: '',
+      password: '',
+    };
+  },
+  methods: {
+    async login() {
+      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+        email: this.email,
+        password: this.password,
+      });
 
-// Reactive variables for login inputs
-const username = ref('')
-const password = ref('')
-
-// Error message state
-const errorMessage = ref('')
-
-// Login function
-const login = async () => {
-  errorMessage.value = ''
-
-  try {
-    // Supabase sign-in
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: username.value, // Assuming username is an email
-      password: password.value,
-    })
-
-    if (error) throw error
-
-    // Redirect to home page on success
-    router.push('/')
-  } catch (error) {
-    errorMessage.value = error.message || 'Login failed. Please try again.'
-  }
-}
+      if (error) {
+        console.error('Login failed:', error.message);
+      } else {
+        const userStore = useUserStore();
+        userStore.setUser(user); // Update the Pinia store
+        console.log('Login successful:', user);
+        this.$router.push('/user-profile'); // Navigate to the profile page
+      }
+    },
+  },
+};
 </script>
 
 
 <template>
-  <section class="form-section-container">
-    <div class="form-section">
-      <form class="user-form" @submit.prevent="login">
-        <h2>Login</h2>
-
-        <label for="username">Email:</label>
-        <input
-          v-model="username"
-          type="text"
-          id="username"
-          name="username"
-          required
-          placeholder="Enter your email"
-        />
-
-        <label for="password">Password:</label>
-        <input
-          v-model="password"
-          type="password"
-          id="password"
-          name="password"
-          required
-          placeholder="Enter your password"
-        />
-
-        <button type="submit">Login</button>
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-
-        <p class="create-account-text">
-          <br />
-          Don't have an account? Create one <RouterLink to="/create-account">here</RouterLink>.
-        </p>
-      </form>
-    </div>
-  </section>
+  <div>
+    <h1>Login</h1>
+    <form @submit.prevent="login">
+      <input v-model="email" type="email" placeholder="Email" required />
+      <input v-model="password" type="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+  </div>
 </template>
 
 

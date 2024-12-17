@@ -6,7 +6,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-      persistSession: true, // Enables session persistence
-      detectSessionInUrl: true, // Handles OAuth redirects
+      persistSession: true, // Enable session persistence
+      detectSessionInUrl: true, // Handle OAuth redirects
     },
-  })
+  });

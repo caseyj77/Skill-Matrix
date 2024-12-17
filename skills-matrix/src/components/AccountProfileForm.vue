@@ -1,130 +1,93 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { supabase } from '@/lib/supabaseClient'
+<script>
+import { supabase } from '@/lib/supabaseClient';
+import { useUserStore } from '@/stores/userStore';
 
-const profile = ref({
-  username: '',
-  email: '',
-  first_name: '',
-  last_name: '',
-  phone_number: '',
-  company_name: '',
-  role: '',
-})
+export default {
+  data() {
+    return {
+      profile: null, // Holds the profile data fetched from the database
+      loading: true, // Tracks whether the data is being loaded
+      errorMessage: '', // Tracks errors during the fetch process
+    };
+  },
+  async mounted() {
+    // Fetch profile data when the component mounts
+    this.fetchProfile();
+  },
+  methods: {
+    async fetchProfile() {
+      this.loading = true;
+      this.errorMessage = '';
 
-const loading = ref(false)
-const successMessage = ref('')
-const errorMessage = ref('')
+      try {
+        const userStore = useUserStore();
+        const user = userStore.user;
 
-// Fetch the user's profile
-const fetchProfile = async () => {
-  loading.value = true
-  errorMessage.value = ''
+        if (!user) {
+          throw new Error('User is not logged in.');
+        }
 
-  try {
-    const { data: session, error: sessionError } = await supabase.auth.getSession()
-    if (sessionError) throw sessionError
+        // Fetch profile data from Supabase
+        const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-    const user = session?.user
-    if (!user) throw new Error('No user logged in')
+        if (error) {
+          throw error;
+        }
 
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    if (error) throw error
-
-    profile.value = data
-  } catch (error) {
-    errorMessage.value = error.message || 'Failed to load profile.'
-  } finally {
-    loading.value = false
-  }
-}
-
-// Update the user's profile
-const updateProfile = async () => {
-  loading.value = true
-  successMessage.value = ''
-  errorMessage.value = ''
-
-  try {
-    const { data: session, error: sessionError } = await supabase.auth.getSession()
-    if (sessionError) throw sessionError
-
-    const user = session?.user
-    if (!user) throw new Error('No user logged in')
-
-    const { error } = await supabase.from('profiles').update(profile.value).eq('id', user.id)
-    if (error) throw error
-
-    successMessage.value = 'Profile updated successfully!'
-  } catch (error) {
-    errorMessage.value = error.message || 'Failed to update profile.'
-  } finally {
-    loading.value = false
-  }
-}
-
-// Fetch profile data on component mount
-onMounted(fetchProfile)
+        this.profile = data; // Save profile data to the state
+      } catch (error) {
+        this.errorMessage = error.message || 'An error occurred while fetching profile data.';
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+};
 </script>
 
 <template>
   <div>
-    <h1>Profile Page</h1>
+    <h1>Profile</h1>
 
-    <div v-if="loading">Loading...</div>
+    <!-- Display Loading Indicator -->
+    <div v-if="loading">Loading profile...</div>
+
+    <!-- Display Error Message -->
     <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-    <form v-else @submit.prevent="updateProfile">
-      <label for="username">Username:</label>
-      <input v-model="profile.username" type="text" id="username" />
+    <!-- Display Profile Information -->
+    <div v-else-if="profile" class="profile">
+      <p><strong>Username:</strong> {{ profile.username }}</p>
+      <p><strong>Email:</strong> {{ profile.email }}</p>
+      <p><strong>First Name:</strong> {{ profile.first_name }}</p>
+      <p><strong>Last Name:</strong> {{ profile.last_name }}</p>
+      <p><strong>Phone Number:</strong> {{ profile.phone_number }}</p>
+      <p><strong>Company Name:</strong> {{ profile.company_name }}</p>
+      <p><strong>Role:</strong> {{ profile.role }}</p>
 
-      <label for="email">Email:</label>
-      <input v-model="profile.email" type="email" id="email" disabled />
+      <!-- Placeholder Update Button -->
+      <button @click="handleUpdateClick">Update Profile</button>
+    </div>
 
-      <label for="first_name">First Name:</label>
-      <input v-model="profile.first_name" type="text" id="first_name" />
-
-      <label for="last_name">Last Name:</label>
-      <input v-model="profile.last_name" type="text" id="last_name" />
-
-      <label for="phone_number">Phone Number:</label>
-      <input v-model="profile.phone_number" type="text" id="phone_number" />
-
-      <label for="company_name">Company Name:</label>
-      <input v-model="profile.company_name" type="text" id="company_name" />
-
-      <label for="role">Role:</label>
-      <select v-model="profile.role" id="role">
-        <option value="user">User</option>
-        <option value="manager">Manager</option>
-        <option value="admin">Admin</option>
-      </select>
-
-      <button type="submit" :disabled="loading">Save</button>
-      <div v-if="successMessage" class="success">{{ successMessage }}</div>
-    </form>
+    <!-- Handle Case Where Profile is Not Available -->
+    <div v-else>
+      <p>No profile data available.</p>
+    </div>
   </div>
 </template>
 
-<style lang="css" scoped>
-form {
-  display: flex;
-  flex-direction: column;
-  max-width: 400px;
-  margin: auto;
+<style scoped>
+/* Style for the profile section */
+.profile {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-label {
+.error {
+  color: red;
   margin-top: 10px;
-  font-weight: bold;
-}
-
-input,
-select {
-  padding: 8px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 }
 
 button {
@@ -137,17 +100,7 @@ button {
   cursor: pointer;
 }
 
-button:disabled {
-  background-color: #aaa;
-}
-
-.success {
-  color: green;
-  margin-top: 10px;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
+button:hover {
+  background-color: #556781;
 }
 </style>
